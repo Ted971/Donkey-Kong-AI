@@ -28,10 +28,11 @@ public class Player : MonoBehaviour
     private int fell = 0;
     private bool climbed = false;
     private float highestPoint;
+    private float wentDown;
     private int nbJump = 0;
     private int dodge;
     private List<GameObject> laddersClimbed;
-    
+    private bool win;
 
     private void Awake(){
         //gm = FindObjectOfType<GameManagerScript>();
@@ -257,16 +258,20 @@ public class Player : MonoBehaviour
         float[] output = network.FeedForward(input);
 
         if(IsClimbing() && (output[1] > 0 || !IsGrounded() /*|| marioPosInit < collide.transform.position.y*/)){
-            if(transform.position.y > highestPoint){
+            if(transform.position.y >= highestPoint){
                 highestPoint = transform.position.y;
+            }else if (wentDown > transform.position.y) {
+                wentDown = transform.position.y;
             }
             IsHitOnLadder();
             climbed = true;
             collide.isTrigger=true;
             dir.y = output[1] * moveSpeed / 2;;
             } else {
-                if(transform.position.y > highestPoint){
+                if(transform.position.y >= highestPoint){
                     highestPoint = transform.position.y;
+                }else if (wentDown > transform.position.y){
+                    wentDown = highestPoint - transform.position.y;
                 }
             collide.isTrigger=false;
             JumpBot(output[2]);
@@ -337,6 +342,15 @@ public class Player : MonoBehaviour
             if(collision.gameObject.CompareTag("Barrel")){
                 dodge++;
             }
+            if(collision.gameObject.CompareTag("Respawn")){
+                fell += 10;
+                dodge = 0;
+            }
+            if(collision.gameObject.CompareTag("Princess")){
+                win = true;
+                enabled = false;
+                gameObject.SetActive(false);
+            }
         }
 
         private GameObject NearestBarrel(){
@@ -381,9 +395,15 @@ public class Player : MonoBehaviour
 
         public void UpdateFitness()
         {
-            network.fitness = highestPoint;//updates fitness of network for sorting
-            if(gotHit){
-                network.fitness -= 10;
+            network.fitness = highestPoint * 10;//updates fitness of network for sorting
+            if(wentDown != 0){
+                if(wentDown < 0){
+                    wentDown *= -1;
+                }
+                network.fitness -= wentDown;
+            }
+            if(gotHit && climbed){
+                network.fitness -= 5 + (laddersClimbed.Count * 5);
             } else if(gotHit && !climbed){
                 network.fitness -= 30;
             }
@@ -399,6 +419,10 @@ public class Player : MonoBehaviour
             if(dodge > 0){
                 network.fitness += dodge * 0.5f;
             }
+            if(win){
+                network.fitness += 10000;
+            }
+            //Debug.Log("fitness"+network.fitness+" d :"+dodge+" c:"+climbed+" y :"+highestPoint+" fell :"+fell+" gothit :"+gotHit+" lost :"+wentDown);
         }
 
     }

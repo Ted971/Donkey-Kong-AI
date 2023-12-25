@@ -84,6 +84,10 @@ public class Barrel : MonoBehaviour
                 speed *= -1;
             }
         }
+        if(collision.gameObject.CompareTag("Respawn")){
+            CancelInvoke();
+            Destroy(gameObject);
+        }
       } 
 
     // Update is called once per frame

@@ -24,12 +24,10 @@ public class Manager : MonoBehaviour
 
     public List<MAIro> networks;
     private List<Player> marios;
-    private static bool botsCreated;
 
     // Start is called before the first frame update
     void Start()
     {
-
             InitNetworks();
             InvokeRepeating(nameof(CreateBots),0.1f, timeFrame);
         
@@ -86,7 +84,7 @@ public class Manager : MonoBehaviour
 
     public void SortNetworks()
     {
-        float highestF = -100;
+        float highestF = -1000;
         for (int i = 0; i < populationSize; i++){
             marios[i].UpdateFitness();
         }
