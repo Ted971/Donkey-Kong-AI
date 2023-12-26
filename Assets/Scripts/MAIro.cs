@@ -13,6 +13,10 @@ public class MAIro : IComparable<MAIro>
     private float[][][] weights;
     private float[] activations;
 
+    private List<GameObject> inputNodes;
+    private List<GameObject> hiddenNodes;
+    private List<GameObject> outputNodes;
+
     public float fitness;
 
     // Start is called before the first frame update
@@ -29,6 +33,35 @@ public class MAIro : IComparable<MAIro>
         InitNeurons();
         InitBiases();
         InitWeights();
+        inputNodes = new List<GameObject>();
+        hiddenNodes = new List<GameObject>();
+        outputNodes = new List<GameObject>();
+        GameObject[] nodes= GameObject.FindGameObjectsWithTag("Node");
+        for(int i=0 ;i<nodes.Length;i++){
+            //Debug.Log("node name"+ nodes[i].name);
+            //Debug.Log("true node name = Node "+ i);
+            //Debug.Log(nodes[i].name.Equals("Node "+i));
+            if(!nodes[i].name.Equals("node "+i)){
+                for(int j=0; j<2; j++){
+                    if(nodes[j].name.Equals("node "+i)){
+                        GameObject buffer = nodes[i];
+                        nodes[i] = nodes[j];
+                        nodes[j] = buffer;
+                        i = 0;
+                    }
+                }
+            }            
+
+        }
+        for(int i = 0; i < 9; i++){
+            inputNodes.Add(nodes[i]);
+        }
+        for(int i = 9; i < 14; i++){
+            hiddenNodes.Add(nodes[i]);
+        }
+        for(int i = 14; i < 17; i++){
+            outputNodes.Add(nodes[i]);
+        }
     }
 
     public void InitAll(int[] layers){
@@ -196,5 +229,46 @@ public class MAIro : IComparable<MAIro>
             }
         }
         writer.Close();
+    }
+
+    public void DrawNN(){
+
+        
+
+        //Debug.Log(weights[1][1][2]);//weights[i][j][k]; [i] means the link from the i-1th layer to the i-th layer | in this case from the 0 (input) layer to the 1 (hidden) layer
+        //[j] means the weights going to the j-th node in the i-th layer | in this case the second node ([0]=1,[1]=2,...) from the hidden layer
+        //[k] represents the weight connecting the k-th node in the i-1th layer to the j-th node in the i-th layer | in this case the weight connecting the third ([2]=3) node from the 0 (input) to the second ([1]=2) node of the 1 (hidden) layer
+        //weights[layer][toNode][fromNode]
+
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new GradientColorKey[] { new GradientColorKey(Color.red, 0.0f), new GradientColorKey(Color.green, 1.0f) },
+            new GradientAlphaKey[] { new GradientAlphaKey(1.5f, 0.0f), new GradientAlphaKey(1.5f, 1.0f) }
+        );
+
+        //for input layers count * (hidden layers count + output layers count) + (hidden layers count * output layers count)
+        for(int i = 0; i < inputNodes.Count; i++){
+            for(int j=0; j<hiddenNodes.Count;j++){
+                LineRenderer lineRenderer = new GameObject().AddComponent<LineRenderer>();
+                lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+                lineRenderer.widthMultiplier = Mathf.Abs(weights[0][j][i]) * 0.15f; //weights scaled down to 15% for readablity
+                lineRenderer.SetPosition(1, inputNodes[i].transform.position);
+                lineRenderer.SetPosition(0, hiddenNodes[j].transform.position);
+                lineRenderer.colorGradient = gradient;
+            }
+        }
+
+
+        for(int i = 0; i < hiddenNodes.Count; i++){
+            for(int j=0; j<outputNodes.Count;j++){
+                LineRenderer lineRenderer = new GameObject().AddComponent<LineRenderer>();
+                lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+                lineRenderer.widthMultiplier = Mathf.Abs(weights[1][j][i]) * 0.15f;
+                lineRenderer.SetPosition(1, hiddenNodes[i].transform.position);
+                lineRenderer.SetPosition(0, outputNodes[j].transform.position);
+                lineRenderer.colorGradient = gradient;
+            }
+        }     
+        
     }
 }

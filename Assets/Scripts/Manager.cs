@@ -24,6 +24,7 @@ public class Manager : MonoBehaviour
 
     public List<MAIro> networks;
     private List<Player> marios;
+    private MAIro bestNet;
 
     // Start is called before the first frame update
     void Start()
@@ -92,9 +93,19 @@ public class Manager : MonoBehaviour
         for(int i = 0; i<populationSize;i++){
             if(networks[i].fitness > highestF){
                 highestF = networks[i].fitness;
+                bestNet = networks[i];
             }
         }
         Debug.Log(highestF);
+        GameObject[] oldWeights = FindObjectsOfType<GameObject>();
+        if (oldWeights != null){
+            for (int i = 0; i < oldWeights.Length; i++){
+                if(oldWeights[i].name.Equals("New Game Object")){
+                Destroy(oldWeights[i]);
+                }
+            }
+        }
+        bestNet.DrawNN();
         networks[populationSize - 1].Save("Assets/Save.txt");
         for (int i = 0; i < populationSize/2; i++){
             networks[i] = networks[i + populationSize / 2].Copy(new MAIro(layers));
