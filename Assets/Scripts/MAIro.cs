@@ -38,21 +38,17 @@ public class MAIro : IComparable<MAIro>
         outputNodes = new List<GameObject>();
         GameObject[] nodes= GameObject.FindGameObjectsWithTag("Node");
         for(int i=0 ;i<nodes.Length;i++){
-            //Debug.Log("node name"+ nodes[i].name);
-            //Debug.Log("true node name = Node "+ i);
-            //Debug.Log(nodes[i].name.Equals("Node "+i));
             if(!nodes[i].name.Equals("node "+i)){
-                for(int j=0; j<2; j++){
+                for(int j=0; j<nodes.Length; j++){
                     if(nodes[j].name.Equals("node "+i)){
                         GameObject buffer = nodes[i];
                         nodes[i] = nodes[j];
                         nodes[j] = buffer;
-                        i = 0;
                     }
                 }
-            }            
-
+            }         
         }
+
         for(int i = 0; i < 9; i++){
             inputNodes.Add(nodes[i]);
         }
@@ -251,7 +247,7 @@ public class MAIro : IComparable<MAIro>
             for(int j=0; j<hiddenNodes.Count;j++){
                 LineRenderer lineRenderer = new GameObject().AddComponent<LineRenderer>();
                 lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-                lineRenderer.widthMultiplier = Mathf.Abs(weights[0][j][i]) * 0.15f; //weights scaled down to 15% for readablity
+                lineRenderer.widthMultiplier = Mathf.Abs(weights[0][j][i]) * 0.10f; //weights scaled down to 15% for readablity
                 lineRenderer.SetPosition(1, inputNodes[i].transform.position);
                 lineRenderer.SetPosition(0, hiddenNodes[j].transform.position);
                 lineRenderer.colorGradient = gradient;
@@ -263,7 +259,7 @@ public class MAIro : IComparable<MAIro>
             for(int j=0; j<outputNodes.Count;j++){
                 LineRenderer lineRenderer = new GameObject().AddComponent<LineRenderer>();
                 lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-                lineRenderer.widthMultiplier = Mathf.Abs(weights[1][j][i]) * 0.15f;
+                lineRenderer.widthMultiplier = Mathf.Abs(weights[1][j][i]) * 0.10f;
                 lineRenderer.SetPosition(1, hiddenNodes[i].transform.position);
                 lineRenderer.SetPosition(0, outputNodes[j].transform.position);
                 lineRenderer.colorGradient = gradient;
