@@ -38,6 +38,9 @@ public class MAIro : IComparable<MAIro>
         outputNodes = new List<GameObject>();
         GameObject[] nodes= GameObject.FindGameObjectsWithTag("Node");
         for(int i=0 ;i<nodes.Length;i++){
+            //Debug.Log("node name"+ nodes[i].name);
+            //Debug.Log("true node name = Node "+ i);
+            //Debug.Log(nodes[i].name.Equals("Node "+i));
             if(!nodes[i].name.Equals("node "+i)){
                 for(int j=0; j<nodes.Length; j++){
                     if(nodes[j].name.Equals("node "+i)){

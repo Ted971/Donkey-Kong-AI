@@ -20,15 +20,23 @@ public class Manager : MonoBehaviour
     [SerializeField]
      [Range(0.1f, 10f)]private float gameSpeed = 1f;
 
+     GameObject[] coins;
+
     private int[] layers = new int[3] {9,5,3}; //9 inputs, 5 magic hidden layers, 3 outputs : jump, walk, climb
 
     public List<MAIro> networks;
     private List<Player> marios;
     private MAIro bestNet;
+    private float bestFitness = -1000;
+
+    private void Awake(){
+        coins = GameObject.FindGameObjectsWithTag("Coin");
+    }
 
     // Start is called before the first frame update
     void Start()
     {
+            
             InitNetworks();
             InvokeRepeating(nameof(CreateBots),0.1f, timeFrame);
         
@@ -39,7 +47,7 @@ public class Manager : MonoBehaviour
         networks = new List<MAIro>();
         for (int i = 0; i < populationSize; i++){
             MAIro net = new MAIro(layers);
-            //net.Load("Assets/Pre-trained.txt");
+            net.Load("Assets/Save.txt");
             networks.Add(net);
         }
     }
@@ -106,10 +114,19 @@ public class Manager : MonoBehaviour
             }
         }
         bestNet.DrawNN();
-        networks[populationSize - 1].Save("Assets/Save.txt");
+        if(networks[populationSize-1].fitness >= bestFitness){
+            bestFitness = networks[populationSize-1].fitness;
+            networks[populationSize - 1].Save("Assets/Save.txt");
+            Debug.Log("saved NN with "+bestFitness+" fitness");
+        }
+    
         for (int i = 0; i < populationSize/2; i++){
             networks[i] = networks[i + populationSize / 2].Copy(new MAIro(layers));
             networks[i].Mutate((int)(1/mutationChance), mutationStrength);
+        }
+
+        for(int i = 0; i < coins.Length; i++){
+            coins[i].SetActive(true);
         }
     }
 

@@ -33,6 +33,7 @@ public class Player : MonoBehaviour
     private int dodge;
     private List<GameObject> laddersClimbed;
     private bool win;
+    private int coins;
 
     private void Awake(){
         //gm = FindObjectOfType<GameManagerScript>();
@@ -339,6 +340,10 @@ public class Player : MonoBehaviour
             if(collision.gameObject.CompareTag("Hole") && !IsGrounded()){
                 fell++;
             }
+            if(collision.gameObject.CompareTag("Coin")){
+                coins++;
+                collision.gameObject.SetActive(false);
+            }
             if(collision.gameObject.CompareTag("Barrel")){
                 dodge++;
             }
@@ -418,6 +423,9 @@ public class Player : MonoBehaviour
             }
             if(dodge > 0){
                 network.fitness += dodge * 0.5f;
+            }
+            if(coins > 0){
+                network.fitness += coins * 10f;
             }
             if(win){
                 network.fitness += 10000;
